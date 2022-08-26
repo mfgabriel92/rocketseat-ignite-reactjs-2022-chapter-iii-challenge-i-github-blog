@@ -10,6 +10,7 @@ interface Issue {
 
 interface IssueContextProps {
   issues: Issue[];
+  loading: boolean;
   searchIssues: (q: string) => void;
 }
 
@@ -17,12 +18,14 @@ const IssueContext = createContext({} as IssueContextProps);
 
 function IssueProvider({ children }: { children: ReactElement }) {
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchAllIssues();
   }, []);
 
   async function fetchAllIssues() {
+    setLoading(true);
     const { data } = await api.get("/repos/facebook/react/issues", {
       params: {
         per_page: 10,
@@ -31,6 +34,7 @@ function IssueProvider({ children }: { children: ReactElement }) {
     });
 
     setIssues(data);
+    setLoading(false);
   }
 
   async function searchIssues(q: string) {
@@ -38,6 +42,7 @@ function IssueProvider({ children }: { children: ReactElement }) {
       return fetchAllIssues();
     }
 
+    setLoading(true);
     const { data } = await api.get("/search/issues", {
       params: {
         q: `${q} repo:facebook/react type:issue`,
@@ -47,9 +52,14 @@ function IssueProvider({ children }: { children: ReactElement }) {
     });
 
     setIssues(data.items);
+    setLoading(false);
   }
 
-  return <IssueContext.Provider value={{ issues, searchIssues }}>{children}</IssueContext.Provider>;
+  return (
+    <IssueContext.Provider value={{ issues, loading, searchIssues }}>
+      {children}
+    </IssueContext.Provider>
+  );
 }
 
 function useIssues() {
