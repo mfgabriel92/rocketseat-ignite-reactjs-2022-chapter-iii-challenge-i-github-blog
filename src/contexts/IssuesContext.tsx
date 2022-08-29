@@ -2,7 +2,7 @@ import { createContext, ReactElement, useContext, useEffect, useState } from "re
 import { api } from "services/api";
 
 interface Issue {
-  id: number;
+  number: number;
   title: string;
   body: string;
   created_at: string;
@@ -10,14 +10,17 @@ interface Issue {
 
 interface IssueContextProps {
   issues: Issue[];
+  issue: Issue | undefined;
   loading: boolean;
   searchIssues: (q: string) => void;
+  fetchIssue: (issueNumber: number) => void;
 }
 
 const IssueContext = createContext({} as IssueContextProps);
 
 function IssueProvider({ children }: { children: ReactElement }) {
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [issue, setIssue] = useState<Issue>();
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -55,8 +58,19 @@ function IssueProvider({ children }: { children: ReactElement }) {
     setLoading(false);
   }
 
+  async function fetchIssue(issueNumber: number) {
+    if (!issueNumber) {
+      return;
+    }
+
+    setLoading(true);
+    const { data } = await api.get(`/repos/facebook/react/issues/${issueNumber}`);
+    setIssue(data);
+    setLoading(false);
+  }
+
   return (
-    <IssueContext.Provider value={{ issues, loading, searchIssues }}>
+    <IssueContext.Provider value={{ issues, issue, loading, searchIssues, fetchIssue }}>
       {children}
     </IssueContext.Provider>
   );

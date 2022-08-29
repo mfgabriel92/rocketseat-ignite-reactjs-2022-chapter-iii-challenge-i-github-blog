@@ -8,7 +8,7 @@ function Router() {
     <Routes>
       <Route path="/" element={<DefaultLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/post" element={<Post />} />
+        <Route path="/issues/:issueId" element={<Post />} />
       </Route>
     </Routes>
   );

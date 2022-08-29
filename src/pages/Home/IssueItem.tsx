@@ -3,15 +3,15 @@ import { formatDistance } from "date-fns";
 import { Link } from "react-router-dom";
 
 interface IssueItemProps {
-  id: number;
+  number: number;
   title: string;
   body: string;
   created_at: string;
 }
 
-function IssueItem({ id, title, body, created_at: createdAt }: IssueItemProps) {
+function IssueItem({ number, title, body, created_at: createdAt }: IssueItemProps) {
   return (
-    <Link to={`/issue/${id}`}>
+    <Link to={`/issues/${number}`}>
       <Flex
         flexDirection="column"
         padding="2rem"
